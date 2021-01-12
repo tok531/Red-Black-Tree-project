@@ -10,15 +10,18 @@ public class RedBlackTree<E> extends AbstractBinaryTree<E> {
 		private Node<E> parent;
 		private Node<E> left;
 		private Node<E> right;
-		private char color;
+		private int color;
 
 
-		public Node(E e, Node<E> above, Node<E> leftChild, Node<E> rightChild,char c ) {
+		public Node(E e, Node<E> above, Node<E> leftChild, Node<E> rightChild,int c ) {
 			element = e;
 			parent = above;
 			left = leftChild;
 			right = rightChild;
 			color=c;
+		}
+		public Node(){
+			
 		}
 
 		public E getElement() {
@@ -36,7 +39,7 @@ public class RedBlackTree<E> extends AbstractBinaryTree<E> {
 		public Node<E> getRight() {
 			return right;
 		}
-		public char getColor(){
+		public int getColor(){
 			return color;
 		}
 
@@ -55,20 +58,26 @@ public class RedBlackTree<E> extends AbstractBinaryTree<E> {
 		public void setRight(Node<E> rightChild) {
 			right = rightChild;
 		}
-		public void setColor(char c){
+		public void setColor(int c){
 			color=c;
 		}
 	}
 	/** Factory function to create a new node storing element e. */
-	protected Node<E> createNode(E e, Node<E> parent, Node<E> left, Node<E> right,char c) {
+	protected Node<E> createNode(E e, Node<E> parent, Node<E> left, Node<E> right,int c) {
 		return new Node<E>(e, parent, left, right,c);
 	}
 	
-	protected Node<E> root = null;
+	protected Node<E> root;
 	private int size = 0;
+	private Node<E> TNULL;
 	
-	public RedBlackTree(){
-	}
+	public RedBlackTree() {
+		TNULL = new Node<E>();
+		TNULL.setColor(0);
+		TNULL.setLeft(null);
+		TNULL.setRight(null);
+		root=TNULL;
+		}
 	
 
 	/** Validates the position and returns it as a node. */
@@ -113,27 +122,9 @@ public class RedBlackTree<E> extends AbstractBinaryTree<E> {
 	public Position<E> addRoot(E e) throws IllegalStateException {
 		if (!isEmpty())
 			throw new IllegalStateException("Tree is not empty");
-		root = createNode(e, null, null, null,'b');
+		root = createNode(e, null, null, null,0);
 		size = 1;
 		return root;
-	}
-	protected Position<E> addLeft(Position<E> p, E e) throws IllegalArgumentException {
-		Node<E> parent = validate(p);
-		if (parent.getLeft() != null)
-			throw new IllegalArgumentException("p already has a left child");
-		Node<E> child = createNode(e, parent, null, null,'r');
-		parent.setLeft(child);
-		size++;
-		return child;
-	}
-	protected Position<E> addRight(Position<E> p, E e) throws IllegalArgumentException {
-		Node<E> parent = validate(p);
-		if (parent.getRight() != null)
-			throw new IllegalArgumentException("p already has a right child");
-		Node<E> child = createNode(e, parent, null, null,'r');
-		parent.setRight(child);
-		size++;
-		return child;
 	}
 	public E set(Position<E> p, E e) throws IllegalArgumentException {
 		Node<E> node = validate(p);
@@ -152,32 +143,31 @@ public class RedBlackTree<E> extends AbstractBinaryTree<E> {
 	}
 	public void preorder(Position<E> p){
 		Node<E> node = (Node<E>)p;
-		if(node==null) return;
-		System.out.print(node.getElement()+" ");
+		if(node==TNULL) return;
+		System.out.print(node.getElement()+","+node.getColor()+" // ");
 		preorder(node.getLeft());
 		preorder(node.getRight());
 	}
 	
 	public void postorder(Position<E> p){
 		Node<E> node = (Node<E>)p;
-		if(node==null) return;
+		if(node==TNULL) return;
 		postorder(node.getLeft());
 		postorder(node.getRight());
-		System.out.print(node.getElement()+" ");
+		System.out.print(node.getElement()+","+node.getColor()+" // ");
 	}
 
 	public void inorder(Position<E> p){
 		Node<E> node = (Node<E>)p;
-		if(node==null) return;
+		if(node==TNULL) return;
 		postorder(node.getLeft());
-		System.out.print(node.getElement()+" ");
+		System.out.print(node.getElement()+","+node.getColor()+"// ");
 		postorder(node.getRight());
 	}
-	public Position<E> LeftRotation(Position<E>p){
-		Node<E> node = validate(p);
+	public void LeftRotation(Node<E> node){
 		Node<E> y=node.getRight();
 		node.setRight(y.getLeft());
-		if(y.getLeft()!=null){
+		if(y.getLeft()!=TNULL){
 			y.getLeft().setParent(node);
 		}
 		y.setParent(node.getParent());
@@ -192,13 +182,11 @@ public class RedBlackTree<E> extends AbstractBinaryTree<E> {
 		}
 		y.setLeft(node);
 		node.setParent(y);
-		return node;
 	}
-	public Position<E> RightRotation(Position<E>p){
-		Node<E> node = validate(p);
+	public void RightRotation(Node<E> node){
 		Node<E> y=node.getLeft();
 		node.setLeft(y.getRight());
-		if(y.getRight()!=null){
+		if(y.getRight()!=TNULL){
 			y.getRight().setParent(node);
 		}
 		y.setParent(node.getParent());
@@ -213,7 +201,111 @@ public class RedBlackTree<E> extends AbstractBinaryTree<E> {
 		}
 		y.setRight(node);
 		node.setParent(y);
-		return node;
+		
+	}
+	public int compare(E a, E b) throws ClassCastException {
+        return ((Comparable<E>) a).compareTo(b);
+    }
+	public void insert(E e){
+		Node<E> node=new Node<E>(e,null,TNULL,TNULL,1);
+		Node<E>y=null;
+		Node<E> x=this.root;
+		while(x!=TNULL){
+			y=x;
+			if(compare(node.getElement(),x.getElement())<0){
+				x=x.getLeft();
+			}
+			else{
+				x=x.getRight();
+			}
+		}
+		node.setParent(y);
+		if(y==null){
+			root=node;
+		}
+		else if(compare(node.getElement(),y.getElement())<0){
+			y.setLeft(node);
+		}
+		else{
+			y.setRight(node);
+		}
+		if(node.getParent()==null){
+			node.setColor(0);
+			return;
+		}
+		if(node.getParent().getParent()==null){
+			return;
+		}
+		fixInsert(node);
+	}
+	public void fixInsert(Node<E> k){
+		Node<E> u;
+		while(k.getParent().getColor()==1){
+			if(k.getParent()==k.getParent().getParent().getRight()){
+				u=k.getParent().getParent().getLeft();
+				if(u.getColor()==1){
+					u.setColor(0);
+					k.getParent().setColor(0);
+					k.getParent().getParent().setColor(1);
+					k=k.getParent().getParent();
+				}else{
+					if(k==k.getParent().getLeft()){
+						k=k.getParent();
+						RightRotation(k);
+					}
+					k.getParent().setColor(0);
+					k.getParent().getParent().setColor(1);
+					LeftRotation(k.getParent().getParent());
+				}
+			}else{
+				u=k.getParent().getParent().getRight();
+				if(u.getColor()==1){
+					u.setColor(0);
+					k.getParent().setColor(0);
+					k.getParent().getParent().setColor(1);
+					k=k.getParent().getParent();
+				}else{
+					if(k==k.getParent().getRight()){
+						k=k.getParent();
+						LeftRotation(k);
+					}
+					k.getParent().setColor(0);
+					k.getParent().getParent().setColor(1);
+					RightRotation(k.getParent().getParent());
+				}
+			}
+			if(k==root){
+				break;
+			}
+		}
+		root.setColor(0);
+	}
+	public static void main(String[] args){
+	    	RedBlackTree bst = new RedBlackTree();
+	        bst.insert(10);
+	    	bst.insert(18);
+	    	bst.insert(7);
+	    	bst.insert(15);
+	    	bst.insert(16);
+	    	bst.insert(30);
+	    	bst.insert(25);
+	    	bst.insert(40);
+	    	bst.insert(60);
+	    	bst.insert(2);
+	    	bst.insert(1);
+	    	bst.insert(70);
+	    	System.out.println("Preorder Traversal");
+			bst.preorder(bst.root());	
+			System.out.println();
+
+			System.out.println(((Node<Integer>)bst.root()).getRight().getRight().getElement());
+			System.out.println(((Node<Integer>)bst.root()).getRight().getRight().getColor());
+			
+	    	
+	
+
+		
+	
 	}
 	
 }
