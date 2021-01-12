@@ -210,6 +210,7 @@ public class RedBlackTree<E> extends AbstractBinaryTree<E> {
 		Node<E> node=new Node<E>(e,null,TNULL,TNULL,1);
 		Node<E>y=null;
 		Node<E> x=this.root;
+		size++;
 		while(x!=TNULL){
 			y=x;
 			if(compare(node.getElement(),x.getElement())<0){
@@ -237,6 +238,7 @@ public class RedBlackTree<E> extends AbstractBinaryTree<E> {
 			return;
 		}
 		fixInsert(node);
+		
 	}
 	public void fixInsert(Node<E> k){
 		Node<E> u;
@@ -300,7 +302,7 @@ public class RedBlackTree<E> extends AbstractBinaryTree<E> {
 
 			System.out.println(((Node<Integer>)bst.root()).getRight().getRight().getElement());
 			System.out.println(((Node<Integer>)bst.root()).getRight().getRight().getColor());
-			
+			System.out.println(bst.size());
 	    	
 	
 
