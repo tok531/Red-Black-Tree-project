@@ -282,7 +282,8 @@ public class RedBlackTree<E> extends AbstractBinaryTree<E> {
 		}
 		root.setColor(0);
 	}
-	public void deleteNode(Node<E> node, E value) {
+	public void deleteNode(Position<E> p, E value) {
+		Node<E> node = validate(p);
 		Node<E> z = TNULL;
 		Node<E> x, y;
 		while (node != TNULL){
@@ -344,7 +345,8 @@ public class RedBlackTree<E> extends AbstractBinaryTree<E> {
 		}
 
 	}
-	private void rebalancing_of_Delete(Node<E> x) {
+	private void rebalancing_of_Delete(Position<E> X) {
+		Node<E> x = validate(X);
 		Node<E> s;
 		while (x != root && x.getColor() == 0) {
 			if (x == x.getParent().getLeft()) {
@@ -407,7 +409,8 @@ public class RedBlackTree<E> extends AbstractBinaryTree<E> {
 		}
 		x.setColor(0);		
 	}
-	private Node<E> minimum(Node<E> rightsubtree) {
+	private Node<E> minimum(Position<E> R) {
+		Node<E> rightsubtree = validate(R);
 		while (rightsubtree.getLeft() != TNULL) {
 
 			rightsubtree = rightsubtree.getLeft();
@@ -418,7 +421,9 @@ public class RedBlackTree<E> extends AbstractBinaryTree<E> {
 
 	}
 
-	private void retransplant(Node<E> z, Node<E> y) {
+	private void retransplant(Position<E> Z, Position<E> Y) {
+		Node<E> z = validate(Z);
+		Node<E> y = validate(Y);
 		if (z.getParent() == null) {
 			root = y;
 		} else if (z == z.getParent().getLeft()){
